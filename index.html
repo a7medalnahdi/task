@@ -1,1 +1,137 @@
-تم إنشاء الملف بنجاح، وجارٍ رفع نسخة HTML قابلة للتنزيل...
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Task Manager - Final Fixed</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white">
+
+<div id="app" class="min-h-screen py-10 px-4 max-w-7xl mx-auto"></div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+let editId = null;
+let darkMode = true;
+
+const departments = {
+  "كرييتف": "#a3e635", "سوشال ميديا": "#f472b6", "ماركتنق": "#f87171",
+  "كواليتي": "#fde047", "الشراكات": "#34d399", "سويتر": "#60a5fa",
+  "اوبريشن": "#a78bfa", "خدمة عملاء": "#fb923c", "تقنية": "#22d3ee"
+};
+
+const statuses = {
+  "غير منجز": "#e74c3c", "منجز": "#27ae60", "جاري العمل": "#3498db",
+  "انتظار الرد": "#8e44ad", "انتظار المحتوى": "#f39c12",
+  "معلق": "#6e4d2b", "ملغي": "#000", "اهمية": "#2ecc71"
+};
+
+function render() {
+  const bg = darkMode ? 'bg-gray-900 text-white' : 'bg-[#ffefe5] text-black';
+  const input = darkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-black';
+  const textSub = darkMode ? 'text-gray-300' : 'text-gray-800';
+
+  document.body.className = bg;
+
+  document.getElementById("app").innerHTML = `
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-2xl font-bold">نظام إدارة الطلبات</h1>
+      <button onclick="toggleMode()" class="px-4 py-2 rounded-full bg-[#ef5b0c] text-white">
+        ${darkMode ? "الوضع النهاري ☀️" : "الوضع الليلي 🌙"}
+      </button>
+    </div>
+
+    <div class="p-6 rounded-2xl ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-md mb-10">
+      <h2 class="text-xl font-bold text-[#ef5b0c] mb-6">إضافة طلب جديد</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${["title","requester","type","size","link","deadline"].map(id => `
+          <input id="${id}" placeholder="${id}" type="${id==='deadline'?'date':'text'}"
+            class="p-3 rounded-xl ${input} w-full" />
+        `).join('')}
+        <select id="department" class="p-3 rounded-xl ${input}">
+          ${Object.keys(departments).map(dep => `<option>${dep}</option>`).join('')}
+        </select>
+        <textarea id="description" rows="2" placeholder="تفاصيل الطلب" class="p-3 rounded-xl ${input} col-span-full"></textarea>
+      </div>
+      <button onclick="addTask()" class="mt-6 w-full bg-[#ef5b0c] py-3 rounded-xl text-white font-bold hover:bg-orange-600">إضافة الطلب</button>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+      ${tasks.map(task => `
+        <div class="p-6 rounded-2xl border border-gray-500 ${darkMode ? 'bg-[#2f2f2f]' : 'bg-gray-100'} shadow-md hover:scale-105 transition">
+          <div class="flex justify-between items-center mb-4">
+            <span class="px-3 py-1 text-xs font-semibold rounded-full" style="background:${departments[task.department]}; color:#000">${task.department}</span>
+            <select onchange="updateStatus(${task.id}, this.value)" class="text-xs font-bold px-3 py-1 rounded-full" style="background:${statuses[task.status]}; color:white">
+              ${Object.keys(statuses).map(s => `<option ${s===task.status?"selected":""}>${s}</option>`).join('')}
+            </select>
+          </div>
+          <h2 class="text-lg font-bold mb-2">${task.title}</h2>
+          <div class="space-y-1 text-sm ${textSub}">
+            <p>👤 <span class="font-semibold">${task.requester || "--"}</span></p>
+            <p>📐 المقاس: ${task.size || "--"}</p>
+            <p>🎨 النوع: ${task.type || "--"}</p>
+            <p>📅 التسليم: ${task.deadline || "--"}</p>
+            <p>🔗 الرابط: <a href="${task.link}" class="text-blue-400 underline">رابط</a></p>
+          </div>
+          <div class="flex justify-between mt-4">
+            <button onclick="editTask(${task.id})" class="bg-blue-600 text-white px-4 py-1 rounded-full text-sm">تعديل</button>
+            <button onclick="deleteTask(${task.id})" class="bg-red-600 text-white px-4 py-1 rounded-full text-sm">حذف</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function val(id) { return document.getElementById(id)?.value || "--"; }
+
+function addTask() {
+  const task = {
+    id: editId ?? Date.now(),
+    title: val("title"), requester: val("requester"),
+    type: val("type"), size: val("size"),
+    link: val("link"), deadline: val("deadline"),
+    description: val("description"), department: val("department"),
+    status: "غير منجز"
+  };
+  tasks = editId ? tasks.map(t => t.id === editId ? task : t) : [...tasks, task];
+  editId = null;
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  render();
+}
+
+function deleteTask(id) {
+  if (confirm("هل تريد حذف الطلب؟")) {
+    tasks = tasks.filter(t => t.id !== id);
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    render();
+  }
+}
+
+function editTask(id) {
+  const t = tasks.find(t => t.id === id);
+  Object.keys(t).forEach(key => {
+    const el = document.getElementById(key);
+    if (el) el.value = t[key];
+  });
+  editId = id;
+}
+
+function updateStatus(id, status) {
+  tasks = tasks.map(t => t.id === id ? { ...t, status } : t);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  render();
+}
+
+function toggleMode() {
+  darkMode = !darkMode;
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
