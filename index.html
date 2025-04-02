@@ -3,75 +3,141 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Task Manager UI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Task Manager</title>
   <style>
-    body { font-family: sans-serif; background: #231f20; color: white; margin: 0; padding: 2rem; direction: rtl; }
-    .container { max-width: 1100px; margin: auto; }
-    .grid { display: grid; gap: 1.5rem; }
-    .form-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem 2rem; }
-    .card { background: #2d2b2b; border-radius: 1.5rem; padding: 2rem; margin-top: 2rem; border: 1px solid #3c3c3c; }
-    label { font-weight: bold; display: block; margin: 0.5rem 0; }
-    input, textarea, select { width: 100%; border-radius: 0.75rem; padding: 0.75rem; background: #3a3a3a; color: white; border: none; margin-bottom: 1rem; }
-    button { background: #ef5b0c; color: white; padding: 0.75rem; border: none; border-radius: 0.75rem; font-size: 1rem; cursor: pointer; width: 100%; }
-    .tasks-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-    .task-card { background: #2f2f2f; border: 1px solid #444; border-radius: 1rem; padding: 1rem; }
-    .task-header { display: flex; justify-content: space-between; align-items: center; }
-    .badge { background: #ef5b0c; color: white; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; }
-    .task-actions { display: flex; justify-content: space-between; margin-top: 1rem; }
-    .task-actions button { background: transparent; padding: 0; font-size: 0.85rem; }
-    .text-red { color: #f87171; }
-    .text-blue { color: #60a5fa; }
+    body { margin: 0; font-family: sans-serif; transition: all 0.3s; }
+    .dark { background-color: #1b1819; color: white; }
+    .light { background-color: #ffefe5; color: black; }
+    .container { max-width: 1100px; margin: auto; padding: 2rem; }
+    .card { background: #2b292a; padding: 2rem; border-radius: 1.5rem; margin-bottom: 2rem; }
+    .input, select, textarea {
+      width: 100%; padding: 0.75rem; margin-bottom: 1rem;
+      border-radius: 0.75rem; border: none;
+      background: #3a3a3a; color: white;
+    }
+    .btn { background: #ef5b0c; color: white; padding: 0.75rem 1rem; border: none; border-radius: 0.75rem; cursor: pointer; }
+    .task { background: #2f2f2f; padding: 1rem; border-radius: 1rem; border: 1px solid #444; margin-bottom: 1rem; }
+    .badge { font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 999px; font-weight: bold; }
   </style>
 </head>
-<body>
+<body class="dark">
   <div class="container">
-    <h1 style="color:#ef5b0c;">إضافة طلب جديد</h1>
-    <div class="card">
-      <div class="grid form-grid">
-        <div><label>عنوان الطلب</label><input type="text"></div>
-        <div><label>اسم صاحب الطلب</label><input type="text"></div>
-        <div><label>نوع الطلب</label><input type="text"></div>
-        <div><label>مقاس التصميم</label><input type="text"></div>
-        <div><label>الرابط</label><input type="text"></div>
-        <div><label>تاريخ التسليم</label><input type="date"></div>
-        <div style="grid-column: span 3;"><label>تفاصيل الطلب</label><textarea rows="4"></textarea></div>
-        <div><label>القسم</label><select><option>كرييتف</option></select></div>
-      </div>
-      <div style="margin-top: 1rem;"><button>إضافة الطلب</button></div>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h1>نظام إدارة الطلبات</h1>
+      <button class="btn" onclick="toggleMode()">تبديل الوضع</button>
     </div>
 
-    <h2 style="color:#ef5b0c;">الطلبات الحالية</h2>
     <div class="card">
-      <div class="grid tasks-grid">
-        <div class="task-card">
-          <div class="task-header">
-            <h3>عنوان الطلب</h3>
-            <span class="badge">غير منجز</span>
-          </div>
-          <p>صاحب الطلب: أحمد</p>
-          <p>القسم: كرييتف</p>
-          <p>الرابط: <a href="#" style="color:#60a5fa;">رابط</a></p>
-          <div class="task-actions">
-            <button class="text-red">حذف</button>
-            <button class="text-blue">تعديل</button>
-          </div>
-        </div>
-        <div class="task-card">
-          <div class="task-header">
-            <h3>عنوان الطلب</h3>
-            <span class="badge">غير منجز</span>
-          </div>
-          <p>صاحب الطلب: أحمد</p>
-          <p>القسم: كرييتف</p>
-          <p>الرابط: <a href="#" style="color:#60a5fa;">رابط</a></p>
-          <div class="task-actions">
-            <button class="text-red">حذف</button>
-            <button class="text-blue">تعديل</button>
-          </div>
-        </div>
+      <h2 style="color:#ef5b0c">إضافة طلب جديد</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+        <input class="input" placeholder="عنوان الطلب" id="title">
+        <input class="input" placeholder="صاحب الطلب" id="requester">
+        <input class="input" placeholder="نوع الطلب" id="type">
+        <input class="input" placeholder="مقاس التصميم" id="size">
+        <input class="input" placeholder="الرابط" id="link">
+        <input class="input" type="date" id="deadline">
+        <textarea class="input" placeholder="تفاصيل" id="description" style="grid-column: span 3;"></textarea>
+        <select class="input" id="department">
+          <option>كرييتف</option><option>سوشال ميديا</option><option>ماركتنق</option>
+          <option>كواليتي</option><option>الشراكات</option><option>سويتر</option>
+          <option>اوبريشن</option><option>خدمة عملاء</option><option>تقنية</option>
+        </select>
       </div>
+      <button class="btn" onclick="addTask()">إضافة الطلب</button>
+    </div>
+
+    <div class="card">
+      <h2 style="color:#ef5b0c">الطلبات الحالية</h2>
+      <div id="tasks"></div>
     </div>
   </div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+let editId = null;
+
+const colors = {
+  "غير منجز": "#e74c3c", "منجز": "#27ae60", "جاري العمل": "#3498db",
+  "انتظار الرد": "#8e44ad", "انتظار المحتوى": "#f39c12",
+  "معلق": "#6e4d2b", "ملغي": "#000", "اهمية": "#2ecc71"
+};
+
+function toggleMode() {
+  document.body.classList.toggle("dark");
+  document.body.classList.toggle("light");
+}
+
+function val(id) { return document.getElementById(id).value || "--"; }
+
+function addTask() {
+  const task = {
+    id: editId ?? Date.now(),
+    title: val("title"), requester: val("requester"),
+    type: val("type"), size: val("size"),
+    link: val("link"), deadline: val("deadline"),
+    description: val("description"),
+    department: val("department"),
+    status: "غير منجز"
+  };
+  tasks = editId ? tasks.map(t => t.id === editId ? task : t) : [...tasks, task];
+  editId = null;
+  save();
+}
+
+function save() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  render();
+}
+
+function render() {
+  const list = document.getElementById("tasks");
+  list.innerHTML = "";
+  tasks.forEach(task => {
+    const card = document.createElement("div");
+    card.className = "task";
+    card.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span class="badge" style="background:${colors[task.status]}; color:white">${task.status}</span>
+        <span class="badge" style="background:#ccc; color:#333">${task.department}</span>
+      </div>
+      <h3>${task.title}</h3>
+      <p>صاحب الطلب: ${task.requester}</p>
+      <p><a href="${task.link}" target="_blank" style="color:#6cf">رابط</a></p>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <button class="btn" style="background:#3498db" onclick="edit(${task.id})">تعديل</button>
+        <button class="btn" style="background:#e74c3c" onclick="remove(${task.id})">حذف</button>
+        <select onchange="changeStatus(${task.id}, this.value)">
+          ${Object.keys(colors).map(status => `<option ${status === task.status ? 'selected' : ''}>${status}</option>`).join('')}
+        </select>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function changeStatus(id, status) {
+  tasks = tasks.map(t => t.id === id ? { ...t, status } : t);
+  save();
+}
+
+function remove(id) {
+  if (confirm("متأكد تبغى تحذف؟")) {
+    tasks = tasks.filter(t => t.id !== id);
+    save();
+  }
+}
+
+function edit(id) {
+  const t = tasks.find(t => t.id === id);
+  for (const key in t) {
+    const el = document.getElementById(key);
+    if (el) el.value = t[key];
+  }
+  editId = id;
+}
+
+render();
+</script>
 </body>
 </html>
