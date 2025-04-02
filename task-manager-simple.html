@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>إدارة الطلبات</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body { font-family: sans-serif; background: #f9fafb; margin: 0; padding: 2rem; direction: rtl; }
+      .card { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 2rem; }
+      .input, select, textarea { width: 100%; padding: .5rem; margin-top: .25rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: .5rem; }
+      .btn { padding: .5rem 1rem; background: #dc2626; color: white; border: none; border-radius: .5rem; cursor: pointer; }
+      .btn.secondary { background: #2563eb; margin-left: .5rem; }
+      .btn.outline { background: transparent; color: #333; border: 1px solid #ccc; }
+      .status { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; margin-top: .5rem; }
+      .task { padding: 1rem; border-radius: .75rem; background: #f3f4f6; margin-bottom: 1rem; }
+      .task-title { font-weight: bold; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h2>إضافة طلب جديد</h2>
+      <input id="title" class="input" placeholder="عنوان الطلب" />
+      <textarea id="description" class="input" placeholder="تفاصيل الطلب"></textarea>
+      <select id="department" class="input">
+        <option value="">اختر القسم</option>
+        <option>ماركتنق</option>
+        <option>كواليتي</option>
+        <option>الشراكات</option>
+        <option>سويتر</option>
+        <option>اوبريشن</option>
+        <option>سوشال ميديا</option>
+        <option>خدمة عملاء</option>
+        <option>تقنية</option>
+        <option>كرييتف</option>
+      </select>
+      <input id="requester" class="input" placeholder="اسم صاحب الطلب" />
+      <input id="type" class="input" placeholder="نوع الطلب" />
+      <input id="size" class="input" placeholder="مقاس التصميم" />
+      <input id="link" class="input" placeholder="الرابط" />
+      <input id="deadline" type="date" class="input" />
+      <button onclick="addTask()" class="btn">إضافة</button>
+    </div>
+
+    <div id="tasks" class="card">
+      <h2>الطلبات</h2>
+      <div id="task-list"></div>
+    </div>
+
+    <script>
+      let tasks = [];
+
+      function addTask() {
+        const task = {
+          id: Date.now(),
+          title: getVal('title'),
+          description: getVal('description'),
+          department: getVal('department'),
+          requester: getVal('requester'),
+          type: getVal('type'),
+          size: getVal('size'),
+          link: getVal('link'),
+          deadline: getVal('deadline'),
+          status: 'غير منجز',
+          date: new Date().toISOString().split('T')[0]
+        };
+        tasks.push(task);
+        renderTasks();
+        document.querySelectorAll('.input').forEach(i => i.value = '');
+      }
+
+      function getVal(id) {
+        return document.getElementById(id).value || '--';
+      }
+
+      function deleteTask(id) {
+        if (confirm('هل أنت متأكد أنك تريد حذف هذا الطلب؟')) {
+          tasks = tasks.filter(t => t.id !== id);
+          renderTasks();
+        }
+      }
+
+      function renderTasks() {
+        const list = document.getElementById('task-list');
+        list.innerHTML = '';
+        tasks.forEach(task => {
+          const el = document.createElement('div');
+          el.className = 'task';
+          el.innerHTML = `
+            <div class="task-title">${task.title}</div>
+            <div>${task.description}</div>
+            <div><strong>القسم:</strong> ${task.department}</div>
+            <div><strong>صاحب الطلب:</strong> ${task.requester}</div>
+            <div><strong>النوع:</strong> ${task.type}</div>
+            <div><strong>مقاس:</strong> ${task.size}</div>
+            <div><strong>الرابط:</strong> ${task.link}</div>
+            <div><strong>التسليم:</strong> ${task.deadline}</div>
+            <div><strong>الحالة:</strong> <span class="status" style="background:#fee2e2;color:#991b1b">${task.status}</span></div>
+            <div><strong>التاريخ:</strong> ${task.date}</div>
+            <div class="flex gap-2">
+              <button onclick="deleteTask(${task.id})" class="btn outline">حذف</button>
+            </div>
+          `;
+          list.appendChild(el);
+        });
+      }
+    </script>
+  </body>
+</html>
