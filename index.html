@@ -4,15 +4,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Task Manager - Fixed Dark</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <title>Task Manager - Polished</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    body { font-family: 'Cairo', sans-serif; }
     body.dark { background-color: #1b1819; color: white; }
     body.light { background-color: #ffefe5; color: black; }
-    .card { border-radius: 1.5rem; padding: 2rem; margin-bottom: 2rem; }
     .input-dark { background-color: #3a3a3a; color: white; }
     .input-light { background-color: #d1d5d8; color: black; }
-    .input-common { padding: 0.75rem; border-radius: 0.75rem; width: 100%; margin-bottom: 1rem; border: none; }
+    .input-common { padding: 0.75rem; border-radius: 0.75rem; width: 100%; border: none; }
+    .section-card { border-radius: 1.5rem; padding: 2rem; }
+    .switch { background: #eee; border-radius: 9999px; width: 70px; height: 36px; display: flex; align-items: center; justify-content: space-between; padding: 4px; position: relative; }
+    .switch-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .switch.active .sun { background: #2563eb; color: white; }
+    .switch:not(.active) .moon { background: #4b5563; color: white; }
+    .badge { font-weight: bold; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; }
+    select { appearance: none; background-image: none !important; }
   </style>
 </head>
 <body class="dark">
@@ -24,9 +32,12 @@
     let editId = null;
     let darkMode = true;
 
-    const departments = [
-      "كرييتف","سوشال ميديا","ماركتنق","كواليتي","الشراكات","سويتر","اوبريشن","خدمة عملاء","تقنية"
-    ];
+    const departments = {
+      "كرييتف": "#a3e635", "سوشال ميديا": "#f472b6", "ماركتنق": "#f87171",
+      "كواليتي": "#fde047", "الشراكات": "#34d399", "سويتر": "#60a5fa",
+      "اوبريشن": "#a78bfa", "خدمة عملاء": "#fb923c", "تقنية": "#22d3ee"
+    };
+
     const statuses = {
       "غير منجز": "#e74c3c", "منجز": "#27ae60", "جاري العمل": "#3498db",
       "انتظار الرد": "#8e44ad", "انتظار المحتوى": "#f39c12",
@@ -35,54 +46,57 @@
 
     function render() {
       const modeClass = darkMode ? "dark" : "light";
-      const inputClass = `input-common ${darkMode ? "input-dark" : "input-light"}`;
+      const inputClass = \`input-common \${darkMode ? "input-dark" : "input-light"}\`;
       document.body.className = modeClass;
 
-      app.innerHTML = `
-        <div class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      app.innerHTML = \`
+        <div class="max-w-7xl mx-auto px-4 py-6 space-y-10">
           <div class="flex justify-between items-center">
             <h1 class="text-2xl font-bold">نظام إدارة الطلبات</h1>
-            <button class="bg-[#ef5b0c] text-white px-4 py-2 rounded-full text-sm" onclick="toggleMode()">
-              ${darkMode ? "الوضع النهاري ☀️" : "الوضع الليلي 🌙"}
-            </button>
+            <div class="switch \${!darkMode ? 'active' : ''}" onclick="toggleMode()">
+              <div class="switch-icon sun">☀️</div>
+              <div class="switch-icon moon">🌙</div>
+            </div>
           </div>
-          <div class="card ${darkMode ? 'bg-[#2b292a]' : 'bg-white'}">
-            <h2 class="text-[#ef5b0c] text-xl font-bold mb-4">إضافة طلب جديد</h2>
+
+          <div class="section-card \${darkMode ? 'bg-[#2b292a]' : 'bg-white'} shadow-md">
+            <h2 class="text-[#ef5b0c] text-xl font-bold mb-6 border-b pb-2">إضافة طلب جديد</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              ${["title","requester","type","size","link","deadline"].map(id => `
-                <input id="${id}" class="${inputClass}" placeholder="${id}" type="${id==='deadline'?'date':'text'}" />
-              `).join('')}
-              <select id="department" class="${inputClass}">
-                ${departments.map(d => `<option>${d}</option>`).join('')}
+              \${["title","requester","type","size","link","deadline"].map(id => \`
+                <input id="\${id}" class="\${inputClass}" placeholder="\${id}" type="\${id==='deadline'?'date':'text'}" />
+              \`).join('')}
+              <select id="department" class="\${inputClass}">
+                \${Object.keys(departments).map(d => \`<option>\${d}</option>\`).join('')}
               </select>
-              <textarea id="description" class="${inputClass} col-span-full" placeholder="تفاصيل الطلب"></textarea>
+              <textarea id="description" class="\${inputClass} col-span-full" placeholder="تفاصيل الطلب"></textarea>
             </div>
             <button onclick="addTask()" class="mt-4 w-full bg-[#ef5b0c] text-white py-3 rounded-xl font-bold hover:bg-orange-600">إضافة الطلب</button>
           </div>
-          <div class="card ${darkMode ? 'bg-[#2b292a]' : 'bg-white'}">
-            <h2 class="text-[#ef5b0c] text-xl font-bold mb-4">الطلبات الحالية</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4" id="tasks">
-              ${tasks.map(task => `
-                <div class="p-4 rounded-2xl border border-gray-500 ${darkMode ? 'bg-[#2f2f2f] text-white' : 'bg-gray-100 text-black'}">
+
+          <div class="section-card \${darkMode ? 'bg-[#2b292a]' : 'bg-white'} shadow-md">
+            <h2 class="text-[#ef5b0c] text-xl font-bold mb-4 border-b pb-2">الطلبات الحالية</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6" id="tasks">
+              \${tasks.map(task => \`
+                <div class="p-4 rounded-2xl border border-gray-500 \${darkMode ? 'bg-[#2f2f2f] text-white' : 'bg-gray-100 text-black'}">
                   <div class="flex justify-between mb-2">
-                    <span class="text-xs font-bold px-3 py-1 rounded-full bg-gray-300 text-black">${task.department}</span>
-                    <select onchange="updateStatus(${task.id}, this.value)" class="text-xs font-bold px-3 py-1 rounded-full" style="background:${statuses[task.status]}; color:white">
-                      ${Object.keys(statuses).map(s => `<option ${s===task.status?'selected':''}>${s}</option>`).join('')}
+                    <span class="badge" style="background:\${departments[task.department]}; color:#000">\${task.department}</span>
+                    <select onchange="updateStatus(\${task.id}, this.value)" class="text-xs font-bold px-3 py-1 rounded-full" style="background:\${statuses[task.status]}; color:white">
+                      \${Object.keys(statuses).map(s => \`<option \${s===task.status?'selected':''}>\${s}</option>\`).join('')}
                     </select>
                   </div>
-                  <h3 class="font-bold text-lg">${task.title}</h3>
-                  <p class="text-sm">صاحب الطلب: ${task.requester}</p>
-                  <a href="${task.link}" target="_blank" class="text-blue-400 underline text-sm">رابط</a>
-                  <div class="flex justify-between pt-4">
-                    <button onclick="editTask(${task.id})" class="text-xs text-blue-400">تعديل</button>
-                    <button onclick="removeTask(${task.id})" class="text-xs text-red-400">حذف</button>
+                  <h3 class="font-bold text-lg">\${task.title}</h3>
+                  <p class="text-sm">صاحب الطلب: \${task.requester}</p>
+                  <a href="\${task.link}" target="_blank" class="text-blue-400 underline text-sm">رابط</a>
+                  <div class="flex justify-between pt-4 gap-2">
+                    <button onclick="editTask(\${task.id})" class="bg-blue-600 text-white px-4 py-1 rounded-full text-xs hover:bg-blue-700">تعديل</button>
+                    <button onclick="removeTask(\${task.id})" class="bg-red-600 text-white px-4 py-1 rounded-full text-xs hover:bg-red-700">حذف</button>
                   </div>
                 </div>
-              `).join('')}
+              \`).join('')}
             </div>
           </div>
         </div>
-      `;
+      \`;
     }
 
     function val(id) { return document.getElementById(id)?.value || "--"; }
