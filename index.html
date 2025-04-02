@@ -4,14 +4,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Task Manager - Final</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <title>Task Manager - Fixed Dark</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <style>
     body.dark { background-color: #1b1819; color: white; }
     body.light { background-color: #ffefe5; color: black; }
     .card { border-radius: 1.5rem; padding: 2rem; margin-bottom: 2rem; }
-    .input { border-radius: 0.75rem; padding: 0.75rem; }
+    .input-dark { background-color: #3a3a3a; color: white; }
+    .input-light { background-color: #d1d5d8; color: black; }
+    .input-common { padding: 0.75rem; border-radius: 0.75rem; width: 100%; margin-bottom: 1rem; border: none; }
   </style>
 </head>
 <body class="dark">
@@ -33,6 +34,10 @@
     };
 
     function render() {
+      const modeClass = darkMode ? "dark" : "light";
+      const inputClass = `input-common ${darkMode ? "input-dark" : "input-light"}`;
+      document.body.className = modeClass;
+
       app.innerHTML = `
         <div class="max-w-7xl mx-auto px-4 py-6 space-y-6">
           <div class="flex justify-between items-center">
@@ -45,12 +50,12 @@
             <h2 class="text-[#ef5b0c] text-xl font-bold mb-4">إضافة طلب جديد</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               ${["title","requester","type","size","link","deadline"].map(id => `
-                <input id="${id}" class="input ${darkMode ? 'bg-[#3a3a3a] text-white' : 'bg-[#d1d5d8] text-black'}" placeholder="${id}" type="${id==='deadline'?'date':'text'}" />
+                <input id="${id}" class="${inputClass}" placeholder="${id}" type="${id==='deadline'?'date':'text'}" />
               `).join('')}
-              <select id="department" class="input ${darkMode ? 'bg-[#3a3a3a] text-white' : 'bg-[#d1d5d8] text-black'}">
+              <select id="department" class="${inputClass}">
                 ${departments.map(d => `<option>${d}</option>`).join('')}
               </select>
-              <textarea id="description" class="input col-span-full ${darkMode ? 'bg-[#3a3a3a] text-white' : 'bg-[#d1d5d8] text-black'}" placeholder="تفاصيل الطلب"></textarea>
+              <textarea id="description" class="${inputClass} col-span-full" placeholder="تفاصيل الطلب"></textarea>
             </div>
             <button onclick="addTask()" class="mt-4 w-full bg-[#ef5b0c] text-white py-3 rounded-xl font-bold hover:bg-orange-600">إضافة الطلب</button>
           </div>
@@ -122,7 +127,6 @@
 
     window.toggleMode = () => {
       darkMode = !darkMode;
-      document.body.className = darkMode ? 'dark' : 'light';
       render();
     };
 
