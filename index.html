@@ -3,38 +3,17 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>نظام إدارة الطلبات</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>نظام الطلبات</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
     body.dark { background-color: #111827; color: white; }
     body.light { background-color: #ffefe5; color: black; }
-    .toggle-container {
-      display: flex;
-      align-items: center;
-      background-color: #e5e7eb;
-      border-radius: 9999px;
-      padding: 4px;
-      cursor: pointer;
-      width: 60px;
-      height: 32px;
-      position: relative;
-    }
-    .toggle-circle {
-      width: 24px;
-      height: 24px;
-      border-radius: 9999px;
-      background-color: white;
-      transition: all 0.3s ease-in-out;
-      position: absolute;
-      top: 4px;
-    }
-    .dark .toggle-circle {
-      transform: translateX(4px);
-    }
-    .light .toggle-circle {
-      transform: translateX(32px);
+    select, option {
+      background: transparent;
+      appearance: none;
+      padding: 0.5rem;
     }
   </style>
 </head>
@@ -68,9 +47,9 @@ function render() {
   document.getElementById("app").innerHTML = `
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold">نظام إدارة الطلبات</h1>
-      <div onclick="toggleMode()" class="toggle-container">
-        <div class="toggle-circle"></div>
-      </div>
+      <button onclick="toggleMode()" class="px-4 py-2 rounded-full bg-[#ef5b0c] text-white">
+        ${darkMode ? "الوضع النهاري ☀️" : "الوضع الليلي 🌙"}
+      </button>
     </div>
 
     <div class="p-6 rounded-2xl ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-md mb-10">
