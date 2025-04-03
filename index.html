@@ -2,14 +2,29 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>نظام إدارة الطلبات - فلترة</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>نظام إدارة الطلبات</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
     body.dark { background-color: #111827; color: white; }
     body.light { background-color: #ffefe5; color: black; }
+    select, input, textarea {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-color: inherit;
+      border: 1px solid #ccc;
+      padding: 0.75rem;
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      width: 100%;
+    }
+    select option {
+      background-color: white;
+      color: black;
+    }
   </style>
 </head>
 <body class="dark">
@@ -17,6 +32,7 @@
 
 <script>
 let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+let form = { title: "", requester: "", type: "", size: "", link: "", deadline: "", department: "كرييتف", status: "غير منجز" };
 let editId = null;
 let darkMode = true;
 let searchQuery = "";
@@ -36,11 +52,9 @@ const statuses = {
 };
 
 function render() {
-  const bg = darkMode ? 'dark' : 'light';
+  document.body.className = darkMode ? 'dark' : 'light';
   const input = darkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black';
   const cardBg = darkMode ? '#1f2937' : '#ffffff';
-
-  document.body.className = bg;
 
   const filtered = tasks.filter(task =>
     (selectedDept === "الكل" || task.department === selectedDept) &&
@@ -56,22 +70,41 @@ function render() {
       </button>
     </div>
 
-    <div class="bg-gray-800 dark:bg-gray-800 light:bg-white p-4 rounded-xl mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-      <select onchange="setDept(this.value)" class="p-3 rounded-lg ${input}">
-        <option>الكل</option>
-        ${Object.keys(departments).map(dep => `<option>${dep}</option>`).join('')}
+    <div class="mb-8 p-6 rounded-2xl shadow-md ${darkMode ? 'bg-[#2b2b2b]' : 'bg-white'}">
+      <h2 class="text-xl font-bold text-[#ef5b0c] mb-4">إضافة طلب جديد</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <input value="${form.title}" onchange="form.title=this.value" placeholder="عنوان الطلب" class="${input}" />
+        <input value="${form.requester}" onchange="form.requester=this.value" placeholder="اسم صاحب الطلب" class="${input}" />
+        <input value="${form.type}" onchange="form.type=this.value" placeholder="نوع الطلب" class="${input}" />
+        <input value="${form.size}" onchange="form.size=this.value" placeholder="مقاس التصميم" class="${input}" />
+        <input value="${form.link}" onchange="form.link=this.value" placeholder="الرابط" class="${input}" />
+        <input type="date" value="${form.deadline}" onchange="form.deadline=this.value" class="${input}" />
+        <select onchange="form.department=this.value" class="${input}">
+          ${Object.keys(departments).map(dep => `<option ${form.department==dep?'selected':''}>${dep}</option>`).join('')}
+        </select>
+        <select onchange="form.status=this.value" class="${input}">
+          ${Object.keys(statuses).map(st => `<option ${form.status==st?'selected':''}>${st}</option>`).join('')}
+        </select>
+      </div>
+      <button onclick="addTask()" class="mt-4 w-full bg-[#ef5b0c] text-white py-3 rounded-xl font-bold hover:bg-orange-600">
+        ${editId !== null ? 'تحديث الطلب' : 'إضافة الطلب'}
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <input oninput="setSearch(this.value)" placeholder="بحث بعنوان الطلب أو الاسم" class="${input}" />
+      <select onchange="setDept(this.value)" class="${input}">
+        <option>الكل</option>${Object.keys(departments).map(dep => `<option>${dep}</option>`).join('')}
       </select>
-      <select onchange="setStatus(this.value)" class="p-3 rounded-lg ${input}">
-        <option>الكل</option>
-        ${Object.keys(statuses).map(s => `<option>${s}</option>`).join('')}
+      <select onchange="setStatus(this.value)" class="${input}">
+        <option>الكل</option>${Object.keys(statuses).map(s => `<option>${s}</option>`).join('')}
       </select>
-      <input oninput="setSearch(this.value)" placeholder="بحث بعنوان الطلب أو الاسم" class="p-3 rounded-lg ${input}" />
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
       ${filtered.map(task => `
-        <div class="p-6 rounded-2xl border shadow-md hover:scale-[1.01] transition"
-             style="background: linear-gradient(to bottom, ${hexToRgba(statuses[task.status], 0.2)}, ${cardBg}); border-color: ${darkMode ? '#4b5563' : '#ccc'};">
+        <div class="p-6 rounded-2xl border shadow-md"
+          style="background: linear-gradient(to bottom, ${hexToRgba(statuses[task.status], 0.15)}, ${cardBg}); border-color: ${darkMode ? '#4b5563' : '#ccc'};">
           <div class="flex justify-between items-center mb-4">
             <span class="px-3 py-1 text-xs font-semibold rounded-full" style="background:${departments[task.department]}; color:#000">${task.department}</span>
             <select onchange="updateStatus(${task.id}, this.value)" class="text-xs font-bold px-3 py-1 rounded-full bg-transparent text-white border border-white">
@@ -103,17 +136,6 @@ function hexToRgba(hex, alpha) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function val(id) { return document.getElementById(id)?.value || "--"; }
-
-function addTask() {}
-function editTask(id) {}
-function deleteTask(id) {}
-function updateStatus(id, status) {
-  tasks = tasks.map(t => t.id === id ? { ...t, status } : t);
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-  render();
-}
-
 function toggleMode() {
   darkMode = !darkMode;
   render();
@@ -130,6 +152,36 @@ function setDept(v) {
 function setStatus(v) {
   selectedStatus = v;
   render();
+}
+
+function addTask() {
+  if (!form.title.trim()) return;
+  if (editId !== null) {
+    tasks = tasks.map(t => t.id === editId ? { ...form, id: editId } : t);
+    editId = null;
+  } else {
+    tasks.push({ ...form, id: Date.now() });
+  }
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  form = { title: "", requester: "", type: "", size: "", link: "", deadline: "", department: "كرييتف", status: "غير منجز" };
+  render();
+}
+
+function editTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  form = { ...task };
+  editId = id;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  render();
+}
+
+function deleteTask(id) {
+  if (confirm("هل أنت متأكد من حذف الطلب؟")) {
+    tasks = tasks.filter(t => t.id !== id);
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    render();
+  }
 }
 
 render();
