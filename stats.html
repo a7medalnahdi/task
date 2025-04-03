@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>إحصائيات الطلبات</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background-color: #0f172a; color: white; font-family: sans-serif; }
+    .card { border-radius: 1rem; padding: 1.5rem; background-color: #1f2937; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+  </style>
+</head>
+<body class="p-6">
+  <div class="max-w-5xl mx-auto space-y-8">
+    <div class="flex justify-between items-center">
+      <h1 class="text-2xl font-bold">📊 إحصائيات الطلبات</h1>
+      <a href="النسخة%20الرسمية%20والاخيرة.html" class="bg-[#ef5b0c] text-white px-4 py-2 rounded-full hover:bg-orange-600">🔙 الرجوع للطلبات</a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="card">
+        <h2 class="text-lg font-semibold mb-2">🔢 إجمالي الطلبات</h2>
+        <p class="text-3xl font-bold" id="totalTasks">0</p>
+      </div>
+
+      <div class="card">
+        <h2 class="text-lg font-semibold mb-2">✅ الطلبات المنجزة</h2>
+        <p class="text-3xl font-bold text-green-400" id="doneTasks">0</p>
+      </div>
+
+      <div class="card">
+        <h2 class="text-lg font-semibold mb-2">🕒 جاري العمل</h2>
+        <p class="text-3xl font-bold text-blue-400" id="inProgressTasks">0</p>
+      </div>
+
+      <div class="card">
+        <h2 class="text-lg font-semibold mb-2">📌 أهمية</h2>
+        <p class="text-3xl font-bold text-emerald-400" id="importantTasks">0</p>
+      </div>
+
+      <div class="card">
+        <h2 class="text-lg font-semibold mb-2">📅 أقرب مواعيد تسليم</h2>
+        <ul class="list-disc list-inside text-sm space-y-1" id="nearestTasks"></ul>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+
+  document.getElementById("totalTasks").textContent = tasks.length;
+  document.getElementById("doneTasks").textContent = tasks.filter(t => t.status === "منجز").length;
+  document.getElementById("inProgressTasks").textContent = tasks.filter(t => t.status === "جاري العمل").length;
+  document.getElementById("importantTasks").textContent = tasks.filter(t => t.status === "اهمية").length;
+
+  const upcoming = tasks
+    .filter(t => t.deadline)
+    .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
+    .slice(0, 3);
+
+  const nearestList = document.getElementById("nearestTasks");
+  if (upcoming.length === 0) {
+    nearestList.innerHTML = "<li>لا توجد مواعيد قريبة</li>";
+  } else {
+    upcoming.forEach(t => {
+      const li = document.createElement("li");
+      li.textContent = `${t.title} - ${t.deadline}`;
+      nearestList.appendChild(li);
+    });
+  }
+</script>
+</body>
+</html>
