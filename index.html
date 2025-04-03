@@ -1,56 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>نظام إدارة الطلبات</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="container">
-    <button id="toggleMode">☀️</button>
-    <button id="showStats">📊 عرض الإحصائيات</button>
-    <div id="formSection">
-      <h2>إضافة طلب جديد</h2>
-      <input type="text" id="title" placeholder="عنوان الطلب" />
-      <input type="text" id="requester" placeholder="اسم صاحب الطلب" />
-      <input type="text" id="type" placeholder="نوع الطلب" />
-      <input type="text" id="size" placeholder="مقاس التصميم" />
-      <input type="text" id="link" placeholder="الرابط" />
-      <input type="date" id="deadline" />
-      <select id="department">
-        <option>كرييتف</option>
-        <option>سوشال ميديا</option>
-        <option>ماركتنق</option>
-        <option>كواليتي</option>
-        <option>الشراكات</option>
-        <option>سويتر</option>
-        <option>اوبريشن</option>
-        <option>خدمة عملاء</option>
-        <option>تقنية</option>
-      </select>
-      <select id="status">
-        <option>غير منجز</option>
-        <option>انتظار الرد</option>
-        <option>اهمية</option>
-        <option>جاري العمل</option>
-        <option>انتظار المحتوى</option>
-        <option>معلق</option>
-        <option>ملغي</option>
-        <option>منجز</option>
-      </select>
-      <textarea id="description" placeholder="تفاصيل الطلب"></textarea>
-      <button onclick="addTask()">إضافة الطلب</button>
-    </div>
-
-    <div id="statsSection" style="display:none">
-      <h2>الإحصائيات</h2>
-      <div id="stats"></div>
-      <button onclick="goBack()">⬅️ رجوع</button>
-    </div>
-
-    <div id="tasksContainer"></div>
-  </div>
+  <div id="app"></div>
   <script src="script.js"></script>
 </body>
 </html>
