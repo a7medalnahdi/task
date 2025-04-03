@@ -1,20 +1,65 @@
 
-const app = document.getElementById('app');
-const stats = {
-  "إجمالي الطلبات": 6,
-  "طلبات منجزة": 2,
-  "طلبات غير منجزة": 2,
-  "طلبات معلقة": 1,
-  "طلبات قيد العمل": 1
-};
+let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
 
-app.innerHTML = `
-  <h1>إحصائيات الطلبات</h1>
-  <div>
-    ${Object.entries(stats).map(([key, val]) => `
-      <div class="card">
-        <strong>${key}:</strong> ${val}
-      </div>
-    `).join('')}
-  </div>
-`;
+function saveTasks() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  renderTasks();
+}
+
+function addTask() {
+  const task = {
+    id: Date.now(),
+    title: document.getElementById("title").value,
+    requester: document.getElementById("requester").value,
+    type: document.getElementById("type").value,
+    size: document.getElementById("size").value,
+    link: document.getElementById("link").value,
+    deadline: document.getElementById("deadline").value,
+    department: document.getElementById("department").value,
+    status: document.getElementById("status").value,
+    description: document.getElementById("description").value
+  };
+  tasks.push(task);
+  saveTasks();
+}
+
+function renderTasks() {
+  const container = document.getElementById("tasksContainer");
+  container.innerHTML = "";
+  tasks.forEach(task => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <strong>${task.title}</strong> - ${task.department} <br/>
+      الحالة: ${task.status} <br/>
+      👤 ${task.requester} | 📐 ${task.size} | 🎨 ${task.type} <br/>
+      📅 ${task.deadline} | 🔗 <a href="${task.link}" style="color:skyblue">رابط</a>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function showStats() {
+  document.getElementById("formSection").style.display = "none";
+  document.getElementById("tasksContainer").style.display = "none";
+  document.getElementById("statsSection").style.display = "block";
+  const stats = {};
+  tasks.forEach(task => {
+    stats[task.status] = (stats[task.status] || 0) + 1;
+  });
+  let output = "";
+  for (let key in stats) {
+    output += `<p>${key}: ${stats[key]}</p>`;
+  }
+  document.getElementById("stats").innerHTML = output;
+}
+
+function goBack() {
+  document.getElementById("formSection").style.display = "block";
+  document.getElementById("tasksContainer").style.display = "block";
+  document.getElementById("statsSection").style.display = "none";
+}
+
+document.getElementById("showStats").onclick = showStats;
+
+renderTasks();
