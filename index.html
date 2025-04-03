@@ -3,164 +3,89 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>نظام الطلبات</title>
+  <title>نظام الطلبات حسب الأشهر</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
-  <style>
-    body.dark { background-color: #111827; color: white; }
-    body.light { background-color: #ffefe5; color: black; }
-    select, option {
-      background: transparent;
-      appearance: none;
-      padding: 0.5rem;
-    }
-  </style>
 </head>
-<body class="dark">
-  <div id="app" class="max-w-7xl mx-auto px-4 py-8"></div>
+<body class="bg-[#0f172a] text-white p-6 space-y-6">
+  <div class="flex justify-between items-center">
+    <h1 class="text-xl font-bold">نظام الطلبات حسب الأشهر</h1>
+    <button onclick="toggleDarkMode()" class="bg-orange-500 px-4 py-2 rounded-full">تبديل الوضع</button>
+  </div>
 
-<script>
-let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-let editId = null;
-let darkMode = true;
-
-const departments = {
-  "كرييتف": "#a3e635", "سوشال ميديا": "#f472b6", "ماركتنق": "#f87171",
-  "كواليتي": "#fde047", "الشراكات": "#34d399", "سويتر": "#60a5fa",
-  "اوبريشن": "#a78bfa", "خدمة عملاء": "#fb923c", "تقنية": "#22d3ee"
-};
-
-const statuses = {
-  "غير منجز": "#e74c3c", "منجز": "#27ae60", "جاري العمل": "#3498db",
-  "انتظار الرد": "#8e44ad", "انتظار المحتوى": "#f39c12",
-  "معلق": "#6e4d2b", "ملغي": "#000", "اهمية": "#2ecc71"
-};
-
-function render() {
-  const bg = darkMode ? 'dark' : 'light';
-  const input = darkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black';
-  const cardBg = darkMode ? '#1f2937' : '#ffffff';
-
-  document.body.className = bg;
-
-  document.getElementById("app").innerHTML = `
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">نظام إدارة الطلبات</h1>
-      <button onclick="toggleMode()" class="px-4 py-2 rounded-full bg-[#ef5b0c] text-white">
-        ${darkMode ? "الوضع النهاري ☀️" : "الوضع الليلي 🌙"}
-      </button>
+  <!-- نموذج الطلب -->
+  <div class="bg-[#2b292a] p-6 rounded-xl">
+    <h2 class="text-orange-400 mb-4 font-bold">إضافة طلب جديد</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <input id="title" class="p-3 rounded bg-gray-800 text-white" placeholder="عنوان الطلب" />
+      <input id="deadline" type="date" class="p-3 rounded bg-gray-800 text-white" />
     </div>
+    <button onclick="addTask()" class="w-full bg-orange-500 py-2 rounded-xl font-bold">إضافة الطلب</button>
+  </div>
 
-    <div class="p-6 rounded-2xl ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-md mb-10">
-      <h2 class="text-xl font-bold text-[#ef5b0c] mb-6">إضافة طلب جديد</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        ${[
-          { id: "title", label: "عنوان الطلب" },
-          { id: "requester", label: "اسم صاحب الطلب" },
-          { id: "type", label: "نوع الطلب" },
-          { id: "size", label: "مقاس التصميم" },
-          { id: "link", label: "الرابط" },
-          { id: "deadline", label: "تاريخ التسليم", type: "date" }
-        ].map(({ id, label, type }) => `
-          <input id="${id}" placeholder="${label}" type="${type || 'text'}"
-            class="p-3 rounded-xl ${input} w-full" />
-        `).join('')}
-        <select id="department" class="p-3 rounded-xl ${input}">
-          ${Object.keys(departments).map(dep => `<option>${dep}</option>`).join('')}
-        </select>
-        <textarea id="description" rows="2" placeholder="تفاصيل الطلب" class="p-3 rounded-xl ${input} col-span-full"></textarea>
-      </div>
-      <button onclick="addTask()" class="mt-6 w-full bg-[#ef5b0c] py-3 rounded-xl text-white font-bold hover:bg-orange-600">إضافة الطلب</button>
-    </div>
+  <!-- عرض الطلبات -->
+  <div id="tasksContainer" class="space-y-4"></div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-      ${tasks.map(task => {
-        const statusColor = statuses[task.status];
-        const grad = darkMode
-          ? `linear-gradient(to bottom, ${hexToRgba(statusColor, 0.25)}, ${cardBg})`
-          : `linear-gradient(to bottom, ${hexToRgba(statusColor, 0.3)}, white)`;
+  <script>
+    let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
 
-        return `
-        <div class="p-6 rounded-2xl border shadow-md hover:scale-[1.01] transition"
-             style="background: ${grad}; border-color: ${darkMode ? '#4b5563' : '#ccc'};">
-          <div class="flex justify-between items-center mb-4">
-            <span class="px-3 py-1 text-xs font-semibold rounded-full" style="background:${departments[task.department]}; color:#000">${task.department}</span>
-            <select onchange="updateStatus(${task.id}, this.value)" class="text-xs font-bold px-3 py-1 rounded-full bg-transparent text-white border border-white">
-              ${Object.keys(statuses).map(s => `<option ${s===task.status?"selected":""}>${s}</option>`).join('')}
-            </select>
-          </div>
-          <h2 class="text-lg font-bold mb-2">${task.title}</h2>
-          <div class="space-y-1 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-800'}">
-            <p>👤 ${task.requester || "--"}</p>
-            <p>📐 المقاس: ${task.size || "--"}</p>
-            <p>🎨 النوع: ${task.type || "--"}</p>
-            <p>📅 التسليم: ${task.deadline || "--"}</p>
-            <p>🔗 الرابط: <a href="${task.link}" class="text-blue-400 underline">رابط</a></p>
-          </div>
-          <div class="flex justify-end gap-2 mt-4">
-            <button onclick="editTask(${task.id})" class="text-blue-500 text-xl"><i class="ph ph-pencil-simple"></i></button>
-            <button onclick="deleteTask(${task.id})" class="text-red-500 text-xl"><i class="ph ph-trash-simple"></i></button>
-          </div>
-        </div>`;
-      }).join('')}
-    </div>
-  `;
-}
+    function groupTasksByMonth() {
+      const grouped = {};
+      tasks.forEach(task => {
+        const date = new Date(task.deadline);
+        const month = date.toLocaleString('default', { month: 'long' });
+        const year = date.getFullYear();
+        const key = `${month} ${year}`;
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(task);
+      });
+      return grouped;
+    }
 
-function hexToRgba(hex, alpha) {
-  const r = parseInt(hex.slice(1,3), 16);
-  const g = parseInt(hex.slice(3,5), 16);
-  const b = parseInt(hex.slice(5,7), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
+    function renderTasks() {
+      const container = document.getElementById("tasksContainer");
+      container.innerHTML = "";
+      const grouped = groupTasksByMonth();
 
-function val(id) { return document.getElementById(id)?.value || "--"; }
+      Object.keys(grouped).forEach(month => {
+        const section = document.createElement("div");
+        section.innerHTML = `
+          <details open class="bg-[#1e293b] p-4 rounded-xl">
+            <summary class="cursor-pointer text-lg font-bold text-orange-300 mb-2">${month} (${grouped[month].length})</summary>
+            <div class="space-y-2 mt-2">
+              ${grouped[month].map(t => `
+                <div class="bg-gradient-to-br from-blue-500/70 to-slate-900/80 p-4 rounded-xl">
+                  <h3 class="font-bold">${t.title}</h3>
+                  <p class="text-sm">📅 ${t.deadline}</p>
+                </div>
+              `).join('')}
+            </div>
+          </details>
+        `;
+        container.appendChild(section);
+      });
+    }
 
-function addTask() {
-  const task = {
-    id: editId ?? Date.now(),
-    title: val("title"), requester: val("requester"),
-    type: val("type"), size: val("size"),
-    link: val("link"), deadline: val("deadline"),
-    description: val("description"), department: val("department"),
-    status: "غير منجز"
-  };
-  tasks = editId ? tasks.map(t => t.id === editId ? task : t) : [...tasks, task];
-  editId = null;
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-  render();
-}
+    function addTask() {
+      const title = document.getElementById("title").value;
+      const deadline = document.getElementById("deadline").value;
+      if (!title || !deadline) return alert("يرجى إدخال العنوان والتاريخ");
+      const task = { title, deadline };
+      tasks.push(task);
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+      document.getElementById("title").value = "";
+      document.getElementById("deadline").value = "";
+      renderTasks();
+    }
 
-function deleteTask(id) {
-  if (confirm("هل تريد حذف الطلب؟")) {
-    tasks = tasks.filter(t => t.id !== id);
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    render();
-  }
-}
+    function toggleDarkMode() {
+      document.body.classList.toggle("bg-[#0f172a]");
+      document.body.classList.toggle("bg-[#ffefe5]");
+      document.body.classList.toggle("text-white");
+      document.body.classList.toggle("text-black");
+    }
 
-function editTask(id) {
-  const t = tasks.find(t => t.id === id);
-  Object.keys(t).forEach(key => {
-    const el = document.getElementById(key);
-    if (el) el.value = t[key];
-  });
-  editId = id;
-}
-
-function updateStatus(id, status) {
-  tasks = tasks.map(t => t.id === id ? { ...t, status } : t);
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-  render();
-}
-
-function toggleMode() {
-  darkMode = !darkMode;
-  render();
-}
-
-render();
-</script>
+    renderTasks();
+  </script>
 </body>
 </html>
