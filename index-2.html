@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>نظام إدارة الطلبات</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .gradient-card {
+      background: linear-gradient(to bottom right, var(--from-color), #1f2937);
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white p-6 space-y-6">
+  <div class="flex justify-between items-center">
+    <button id="toggle-archive" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-full">
+      📦 عرض الأرشيف
+    </button>
+    <h1 class="text-2xl font-bold">نظام إدارة الطلبات</h1>
+  </div>
+
+  <div id="tasks" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <!-- Cards will be inserted here -->
+  </div>
+
+  <script>
+    const tasks = [
+      { title: "جوار", requester: "أحمد", department: "الشراكات", status: "جاري العمل", archived: false },
+      { title: "تقرير الحملة", requester: "", department: "ماركتنق", status: "منجز", archived: true },
+      { title: "بوستر إعلان", requester: "", department: "كرييتف", status: "انتظار المحتوى", archived: false }
+    ];
+
+    const colors = {
+      "جاري العمل": "#3b82f6",
+      "منجز": "#10b981",
+      "انتظار المحتوى": "#f59e0b",
+      "ملغي": "#ef4444"
+    };
+
+    const departments = {
+      "كرييتف": "bg-lime-200 text-lime-800",
+      "سوشال ميديا": "bg-pink-200 text-pink-800",
+      "ماركتنق": "bg-red-200 text-red-800",
+      "كواليتي": "bg-yellow-200 text-yellow-800",
+      "الشراكات": "bg-green-200 text-green-800",
+      "سويتر": "bg-blue-200 text-blue-800",
+    };
+
+    const render = (showArchived) => {
+      document.getElementById("tasks").innerHTML = "";
+      tasks.forEach(t => {
+        if (!showArchived && t.archived) return;
+        const card = document.createElement("div");
+        card.className = "rounded-2xl p-4 shadow-lg text-white";
+        card.style.setProperty("--from-color", colors[t.status] || "#6b7280");
+        card.classList.add("gradient-card");
+        card.innerHTML = `
+          <div class="flex justify-between mb-2">
+            <span class="text-xs bg-white/20 border border-white/30 backdrop-blur-sm rounded-full px-3 py-1">${t.status}</span>
+            <span class="text-xs px-3 py-1 rounded-full ${departments[t.department] || "bg-gray-200 text-black"}">${t.department}</span>
+          </div>
+          <h3 class="font-bold text-lg">${t.title}</h3>
+          <p class="text-sm opacity-80">👤 ${t.requester || '--'}</p>
+          <p class="text-sm opacity-80 mt-1">🔗 الرابط: <a class="underline text-blue-400" href="#">رابط</a></p>
+        `;
+        document.getElementById("tasks").appendChild(card);
+      });
+    };
+
+    let archiveVisible = false;
+    document.getElementById("toggle-archive").onclick = () => {
+      archiveVisible = !archiveVisible;
+      document.getElementById("toggle-archive").textContent = archiveVisible ? "📦 إخفاء الأرشيف" : "📦 عرض الأرشيف";
+      render(archiveVisible);
+    };
+
+    render(false);
+  </script>
+</body>
+</html>
