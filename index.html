@@ -3,17 +3,17 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>نظام إدارة الطلبات</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>نظام إدارة الطلبات</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    * { transition: all 0.3s ease; }
+    .transition-all { transition: all 0.3s ease-in-out; }
     .card-enter {
       opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInUp 0.5s forwards;
+      transform: translateY(15px);
+      animation: fadeIn 0.4s forwards;
     }
-    @keyframes fadeInUp {
+    @keyframes fadeIn {
       to {
         opacity: 1;
         transform: translateY(0);
@@ -37,29 +37,27 @@
     }
   </style>
 </head>
-<body class="dark-mode min-h-screen p-6">
+<body class="dark-mode min-h-screen p-6 transition-all">
   <div class="max-w-6xl mx-auto space-y-6">
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center mb-4">
       <h1 class="text-2xl font-bold">نظام إدارة الطلبات</h1>
-      <button onclick="toggleMode()" id="modeBtn" class="bg-orange-500 px-4 py-2 rounded-full transition hover:scale-105">
-        🌙 الوضع النهاري
-      </button>
+      <button onclick="toggleMode()" id="modeBtn" class="bg-orange-500 px-4 py-2 rounded-full">🌙 الوضع النهاري</button>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <input id="title" placeholder="عنوان الطلب" class="p-3 rounded-xl input-dark" />
-      <input id="owner" placeholder="اسم صاحب الطلب" class="p-3 rounded-xl input-dark" />
-      <input id="type" placeholder="نوع الطلب" class="p-3 rounded-xl input-dark" />
-      <input id="size" placeholder="مقاس التصميم" class="p-3 rounded-xl input-dark" />
-      <input id="link" placeholder="الرابط" class="p-3 rounded-xl input-dark" />
-      <input id="date" type="date" class="p-3 rounded-xl input-dark" />
+      <input id="title" placeholder="عنوان الطلب" class="p-3 rounded-xl input-dark transition-all" />
+      <input id="owner" placeholder="اسم صاحب الطلب" class="p-3 rounded-xl input-dark transition-all" />
+      <input id="type" placeholder="نوع الطلب" class="p-3 rounded-xl input-dark transition-all" />
+      <input id="size" placeholder="مقاس التصميم" class="p-3 rounded-xl input-dark transition-all" />
+      <input id="link" placeholder="الرابط" class="p-3 rounded-xl input-dark transition-all" />
+      <input id="date" type="date" class="p-3 rounded-xl input-dark transition-all" />
     </div>
 
-    <button onclick="addTask()" class="mt-4 w-full bg-orange-500 py-3 rounded-xl font-bold text-white hover:bg-orange-600 transition hover:scale-105">
-      ➕ إضافة الطلب
+    <button onclick="addTask()" class="mt-4 w-full bg-orange-500 py-3 rounded-xl font-bold text-white hover:bg-orange-600 transition-all">
+      إضافة الطلب
     </button>
 
-    <div id="tasks" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-8"></div>
+    <div id="tasks" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-8"></div>
   </div>
 
   <script>
@@ -72,7 +70,7 @@
       container.innerHTML = "";
       tasks.forEach((t, index) => {
         const card = document.createElement("div");
-        card.className = "card-enter bg-gradient-to-br from-blue-500 to-slate-900 p-5 rounded-2xl shadow-md space-y-2";
+        card.className = "card-enter bg-gradient-to-br from-blue-500 to-slate-900 p-5 rounded-2xl shadow space-y-2 transition-all";
         card.innerHTML = `
           <h2 class="text-lg font-bold">${t.title}</h2>
           <p>👤 ${t.owner}</p>
@@ -111,9 +109,9 @@
     function toggleMode() {
       const body = document.body;
       dark = !dark;
-      body.className = dark ? 'dark-mode min-h-screen p-6' : 'light-mode min-h-screen p-6';
+      body.className = dark ? 'dark-mode min-h-screen p-6 transition-all' : 'light-mode min-h-screen p-6 transition-all';
       document.querySelectorAll("input").forEach(input => {
-        input.className = "p-3 rounded-xl " + (dark ? "input-dark" : "input-light");
+        input.className = "p-3 rounded-xl transition-all " + (dark ? "input-dark" : "input-light");
       });
       modeBtn.innerHTML = dark ? "🌙 الوضع النهاري" : "☀️ الوضع الليلي";
     }
