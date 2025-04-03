@@ -1,35 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>نظام إدارة الطلبات</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link href="styles.css" rel="stylesheet" />
 </head>
-<body class="bg-gray-900 text-white min-h-screen p-4" onload="loadTasks()">
-  <div class="flex justify-between mb-6">
-    <button id="toggleMode" onclick="toggleMode()" class="bg-orange-500 text-white px-4 py-2 rounded-full">☀️</button>
-    <a href="stats.html" class="bg-blue-600 text-white px-4 py-2 rounded-full">📊 عرض الإحصائيات</a>
-  </div>
-  <form id="taskForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-800 p-4 rounded-xl mb-8">
-    <input placeholder="عنوان الطلب" name="title" class="p-2 rounded bg-gray-700" />
-    <input placeholder="اسم صاحب الطلب" name="requester" class="p-2 rounded bg-gray-700" />
-    <input placeholder="نوع الطلب" name="type" class="p-2 rounded bg-gray-700" />
-    <input placeholder="مقاس التصميم" name="size" class="p-2 rounded bg-gray-700" />
-    <input placeholder="الرابط" name="link" class="p-2 rounded bg-gray-700" />
-    <input type="date" name="deadline" class="p-2 rounded bg-gray-700" />
-    <select name="department" class="p-2 rounded bg-gray-700">
-      <option>كرييتف</option><option>سوشال ميديا</option><option>ماركتنق</option><option>كواليتي</option>
-      <option>الشراكات</option><option>سويتر</option><option>اوبريشن</option><option>خدمة عملاء</option><option>تقنية</option>
-    </select>
-    <select name="status" class="p-2 rounded bg-gray-700">
-      <option>غير منجز</option><option>انتظار الرد</option><option>اهمية</option><option>جاري العمل</option>
-      <option>انتظار المحتوى</option><option>معلق</option><option>ملغي</option><option>منجز</option>
-    </select>
-    <textarea name="description" rows="2" placeholder="تفاصيل الطلب" class="col-span-2 p-2 rounded bg-gray-700"></textarea>
-    <button type="submit" class="col-span-2 bg-orange-600 py-2 text-white rounded">إضافة الطلب</button>
-  </form>
-  <div id="taskList" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3"></div>
-
+<body>
+  <div id="app"></div>
   <script src="script.js"></script>
 </body>
 </html>
