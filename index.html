@@ -40,7 +40,7 @@ const statuses = {
 function render() {
   const bg = darkMode ? 'dark' : 'light';
   const input = darkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black';
-  const cardBg = '#1f2937';
+  const cardBg = darkMode ? '#1f2937' : '#ffffff';
 
   document.body.className = bg;
 
@@ -77,9 +77,13 @@ function render() {
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
       ${tasks.map(task => {
         const statusColor = statuses[task.status];
+        const grad = darkMode
+          ? `linear-gradient(to bottom, ${hexToRgba(statusColor, 0.25)}, ${cardBg})`
+          : `linear-gradient(to bottom, ${hexToRgba(statusColor, 0.3)}, white)`;
+
         return `
         <div class="p-6 rounded-2xl border shadow-md hover:scale-[1.01] transition"
-             style="background: linear-gradient(to bottom, ${hexToRgba(statusColor, 0.25)}, ${cardBg}); border-color: ${darkMode ? '#4b5563' : '#ccc'};">
+             style="background: ${grad}; border-color: ${darkMode ? '#4b5563' : '#ccc'};">
           <div class="flex justify-between items-center mb-4">
             <span class="px-3 py-1 text-xs font-semibold rounded-full" style="background:${departments[task.department]}; color:#000">${task.department}</span>
             <select onchange="updateStatus(${task.id}, this.value)" class="text-xs font-bold px-3 py-1 rounded-full bg-transparent text-white border border-white">
